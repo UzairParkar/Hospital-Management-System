@@ -9,7 +9,7 @@ appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
 
 @appointments.route('/create', methods=['POST'])
 @jwt_required()
-def createappointment():
+def create():
     staffcred = get_jwt()
     role = staffcred.get('role')
 
@@ -45,7 +45,7 @@ def createappointment():
 
 @appointments.route('/read', methods=['GET'])
 @jwt_required()
-def readappointments():
+def read_app():
     staffcred = get_jwt()
     role = staffcred.get('role')
     if role == 'admin':
@@ -58,7 +58,7 @@ def readappointments():
 
 @appointments.route('/read/<int:id>', methods=['GET'])
 @jwt_required()
-def readappointmentbyid(id):
+def read_by_id(id):
     staffcred = get_jwt()
     role = staffcred.get('role')
     if role == 'admin':
@@ -73,7 +73,7 @@ def readappointmentbyid(id):
 
 @appointments.route('/delete/<int:id>', methods=['DELETE'])
 @jwt_required()
-def deleteappointment(id):
+def delete_app(id):
     staffcred = get_jwt()
     role = staffcred.get('role')
     if role != 'staff':
@@ -90,7 +90,7 @@ def deleteappointment(id):
 
 @appointments.route('/update/<int:id>', methods=['PUT'])
 @jwt_required()
-def updateappointment(id):
+def update_app(id):
     staffcred = get_jwt()
     role = staffcred.get('role')
     ddata = request.get_json()
