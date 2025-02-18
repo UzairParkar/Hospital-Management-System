@@ -18,6 +18,7 @@ def readall():
         return staffs_schema.dump(staff),200
 
 
+
 @staff.route('/read/<int:id>',methods=['GET'])
 @jwt_required()
 def readbyid(id):
@@ -31,26 +32,47 @@ def readbyid(id):
         return staff_schema.dump(staff),200
     
 
-@staff.route('/update/<int:id>',methods=['PUT'])
+
+@staff.route('/update/<int:id>', methods=['PUT'])
 @jwt_required()
 def updatestaff(id):
     current_user = get_jwt_identity()
+    staffcred = get_jwt()
+    role = staffcred.get('role')
     ddata = request.get_json()
-    if int(current_user) != id:
-        return jsonify({"message":"You can only make changes yo your own profile"}), 403
-    else:
-        staff = Staff.query.get(id)
-        if not staff:
-            return jsonify({'message':"staff not found"}), 404
-        staff.first_name = ddata.get('first_name',staff.first_name)
-        staff.last_name = ddata.get('last_name',staff.last_name)
-        staff.email = ddata.get('email',staff.email)
+    staff = Staff.query.get(id)
 
-        if 'password' in ddata:
+    if not staff:
+        return jsonify({'message': "Staff not found"}), 404
+        
+    if role == 'admin':
+        if staff.role == 'admin' and 'password' in ddata:
+            return jsonify({"message": "You cannot change the password of another admin"}), 403
+        
+        if 'role' in ddata:
+            staff.role = ddata['role']
+            db.session.commit()
+            return staff_schema.dump(staff), 200
+
+    if role == 'staff':
+        if int(current_user) != id:
+            return jsonify({"message": "You can only update your own profile"}), 403
+
+        if 'role' in ddata:
+            return jsonify({"message": "You cannot change your own role"}), 403
+    
+        staff.first_name = ddata.get('first_name', staff.first_name)
+        staff.last_name = ddata.get('last_name', staff.last_name)
+        staff.email = ddata.get('email', staff.email)
+
+        if 'password' in ddata and ddata['password'].strip():
             staff.password = ddata['password']
 
-            db.session.commit()
-            return staff_schema.dump(staff),200
+        db.session.commit()
+        return staff_schema.dump(staff), 200
+
+    return jsonify({"message": "Unauthorized"}), 403
+
         
 
 @staff.route('/delete/<int:id>',methods=['DELETE'])
