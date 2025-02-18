@@ -14,6 +14,11 @@ def hiredoctor():
 
     if role != 'admin':
         return jsonify({"Message":"Only admins can manage doctors"}),403
+    if role == 'staff':
+        required_fields = ['first_name', 'last_name', 'contact', 'from_time', 'to_time', 'specs']
+        for field in required_fields:
+            if not data.get(field) or data.get(field) == '':
+                return jsonify({"Message": f"{field.replace('_', ' ').capitalize()} cannot be empty."}), 400
     else:
         data = request.get_json()
         try:
@@ -54,7 +59,7 @@ def readbyid(id):
     if id:
         doctor = Doctors.query.get(id)
         if not doctor:
-            return jsonify({"message":"Doctor does not exist"})
+            return jsonify({"message":"Doctor does not exist"}),404
         return doctor_schema.dump(doctor),200
 
 @doctors.route('/update/<int:id>',methods=['PUT'])
@@ -87,7 +92,7 @@ def deletepatient(id):
         return jsonify({"message":"Only an admin can fire a doctor"}), 403
     doctor = Doctors.query.get(id)
     if not doctor:
-        return jsonify({"Message":"Doctor Does not Exist"})
+        return jsonify({"Message":"Doctor Does not Exist"}),404
     db.session.delete(doctor)
     db.session.commit()
     return jsonify({"message":"Doctor Deleted"})

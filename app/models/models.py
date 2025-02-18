@@ -52,5 +52,21 @@ class Appointments(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
     a_date = db.Column(db.Date, nullable=False)
     a_time = db.Column(db.Time, nullable=False)
+    doctor_first_name = db.Column(db.String(100), nullable=False)
+    doctor_last_name = db.Column(db.String(100), nullable=False)
+    patient_first_name = db.Column(db.String(100), nullable=False)
+    patient_last_name = db.Column(db.String(100), nullable=False)
     patient = db.relationship('Patients', backref='appointments', lazy=True)
     doctor = db.relationship('Doctors', backref='appointments', lazy=True)
+
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        if self.doctor_id:
+            doctor = Doctors.query.get(self.doctor_id)
+            self.doctor_first_name = doctor.first_name if doctor else ''
+            self.doctor_last_name = doctor.last_name if doctor else ''
+        if self.patient_id:
+            patient = Patients.query.get(self.patient_id)
+            self.patient_first_name = patient.first_name  if patient else ''
+            self.patient_last_name = patient.last_name  if patient else ''
+

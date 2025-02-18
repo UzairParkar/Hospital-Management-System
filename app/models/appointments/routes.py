@@ -18,11 +18,17 @@ def createappointment():
 
     if role == 'staff':
         data = request.get_json()
+        required_fields = ['patient_id', 'doctor_id', 'a_date', 'a_time']
+        for field in required_fields:
+            if not data.get(field) or data.get(field) == '':
+                return jsonify({"Message": f"{field.replace('_', ' ').capitalize()} cannot be empty."}), 400
+                
         try:
             patient = Patients.query.get(data['patient_id'])
             doctor = Doctors.query.get(data['doctor_id'])
             if not patient or not doctor:
                 return jsonify({"Message": "Invalid patient or doctor ID"}), 404
+            
 
             appointment = Appointments(
                 patient_id=data['patient_id'],

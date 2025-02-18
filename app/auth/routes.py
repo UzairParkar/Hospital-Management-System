@@ -46,9 +46,13 @@ def login():
 
     if not email or not password:
         return {'message': 'Email and password are required'}, 400
-
+    
     
     staff = Staff.query.filter_by(email=ddata['email']).first()
+
+    if not staff:
+        return jsonify({"message":"User does not exist"}), 404
+
 
     if not staff or not staff.verify_password(password):
          return jsonify({"Message":'invalid credentials'}), 404

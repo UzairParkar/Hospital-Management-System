@@ -15,9 +15,14 @@ def createpatient():
 
     if role =='admin':
         return jsonify({"Message":"Only Staff are allowed to manage patients"}),403
+    
 
     if role == 'staff':
         data = request.get_json()
+        required_fields = ['first_name', 'last_name', 'contact', 'email', 'age', 'gender', 'blood_group', 'medical_history']
+        for field in required_fields:
+            if not data.get(field) or data.get(field) == '':
+                return jsonify({"Message": f"{field.replace('_', ' ').capitalize()} cannot be empty."}), 400
         try:
             patient = Patients(
                 first_name = data['first_name'],

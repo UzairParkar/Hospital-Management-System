@@ -36,6 +36,10 @@ class AppointmentSchema(Schema):
     doctor_id = fields.Int(required=True)
     a_date = fields.Date(required=True)
     a_time = fields.Time(required=True)
+    doctor_first_name = fields.Str(dump_only=True)
+    doctor_last_name = fields.Str(dump_only=True)
+    patient_first_name = fields.Str(dump_only=True)
+    patient_last_name = fields.Str(dump_only=True)
 
 staff_schema = StaffSchema()
 staffs_schema = StaffSchema(many=True)
